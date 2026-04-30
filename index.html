@@ -16,7 +16,6 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Schwarzer Kasten */
 .box {
   width: 260px;
   height: 360px;
@@ -42,9 +41,9 @@ body {
 
 /* Großer Button */
 .main-btn {
-  margin-top: 60px; /* 🔥 weiter runter */
-  width: 150px;
-  height: 150px;
+  margin-top: 75px; /* 🔥 etwas weiter runter */
+  width: 155px;
+  height: 155px;
   border-radius: 50%;
   border: none;
   color: white;
@@ -52,18 +51,18 @@ body {
   background: radial-gradient(circle at 30% 30%, #6fff6f, #1e8f1e);
 }
 
-/* Reset Button oben rechts RAND */
+/* Reset Button (JETZT PERFEKT POSITIONIERT) */
 .reset-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 45px;
-  height: 45px;
+  top: 115px;   /* 🔥 runter */
+  right: 25px;  /* 🔥 etwas nach links */
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: none;
   background: #2ecc40;
   color: white;
-  font-size: 20px;
+  font-size: 18px;
 }
 </style>
 </head>
@@ -72,11 +71,11 @@ body {
 
 <div class="box">
 
-  <button class="reset-btn" onclick="resetCounter()">↻</button>
-
   <div id="counter" class="display">0000</div>
 
   <button class="main-btn" onclick="clickBtn()">DRÜCKEN</button>
+
+  <button class="reset-btn" onclick="resetCounter()">↻</button>
 
 </div>
 
