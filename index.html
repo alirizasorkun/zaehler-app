@@ -3,11 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Dhikr Zähler</title>
-
-<!-- App Icon für iPhone/iPad -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='38' fill='%23303234'/%3E%3Crect x='42' y='28' width='96' height='124' rx='18' fill='%230b0b0b'/%3E%3Crect x='54' y='44' width='72' height='28' rx='6' fill='%23d8d8d8' stroke='%232ecc40' stroke-width='4'/%3E%3Ccircle cx='90' cy='111' r='32' fill='%232ecc40'/%3E%3C/svg%3E">
 
 <style>
 html, body {
@@ -19,10 +15,17 @@ html, body {
   justify-content: center;
   align-items: center;
   font-family: Arial, sans-serif;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+button {
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
-  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .box {
@@ -77,7 +80,6 @@ html, body {
   font-weight: bold;
 }
 
-/* Custom Popup */
 .modal-bg {
   display: none;
   position: fixed;
@@ -140,9 +142,9 @@ html, body {
 <div class="box">
   <div id="counter" class="display">0000</div>
 
-  <button class="main-btn" onclick="clickBtn()">DRÜCKEN</button>
+  <button id="mainBtn" class="main-btn">DRÜCKEN</button>
 
-  <button class="reset-btn" onclick="openReset()">↻</button>
+  <button id="resetBtn" class="reset-btn">↻</button>
 </div>
 
 <div id="modalBg" class="modal-bg">
@@ -151,32 +153,33 @@ html, body {
     <p>Möchten Sie wirklich neu starten?</p>
 
     <div class="modal-buttons">
-      <button class="no-btn" onclick="closeReset()">Nein</button>
-      <button class="yes-btn" onclick="confirmReset()">Ja</button>
+      <button id="noBtn" class="no-btn">Nein</button>
+      <button id="yesBtn" class="yes-btn">Ja</button>
     </div>
   </div>
 </div>
 
 <script>
 let count = Number(localStorage.getItem("dhikrCounter")) || 0;
-update();
-
-function clickBtn() {
-  count++;
-  save();
-  update();
-}
+const counter = document.getElementById("counter");
 
 function update() {
-  document.getElementById("counter").innerText =
-    count.toString().padStart(4, "0");
+  counter.innerText = count.toString().padStart(4, "0");
 }
 
 function save() {
   localStorage.setItem("dhikrCounter", count);
 }
 
-function openReset() {
+function addCount(e) {
+  e.preventDefault();
+  count++;
+  save();
+  update();
+}
+
+function openReset(e) {
+  e.preventDefault();
   document.getElementById("modalBg").style.display = "flex";
 }
 
@@ -191,15 +194,12 @@ function confirmReset() {
   closeReset();
 }
 
-/* Double-Tap-Zoom verhindern */
-let lastTouch = 0;
-document.addEventListener("touchend", function(e) {
-  let now = Date.now();
-  if (now - lastTouch <= 300) {
-    e.preventDefault();
-  }
-  lastTouch = now;
-}, { passive: false });
+document.getElementById("mainBtn").addEventListener("pointerdown", addCount);
+document.getElementById("resetBtn").addEventListener("pointerdown", openReset);
+document.getElementById("noBtn").addEventListener("pointerdown", closeReset);
+document.getElementById("yesBtn").addEventListener("pointerdown", confirmReset);
+
+update();
 </script>
 
 </body>
