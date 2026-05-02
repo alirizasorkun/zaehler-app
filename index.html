@@ -2,18 +2,27 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Dhikr Zähler</title>
 
+<!-- App Icon für iPhone/iPad -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='38' fill='%23303234'/%3E%3Crect x='42' y='28' width='96' height='124' rx='18' fill='%230b0b0b'/%3E%3Crect x='54' y='44' width='72' height='28' rx='6' fill='%23d8d8d8' stroke='%232ecc40' stroke-width='4'/%3E%3Ccircle cx='90' cy='111' r='32' fill='%232ecc40'/%3E%3C/svg%3E">
+
 <style>
-body {
+html, body {
   margin: 0;
+  padding: 0;
   background: #3a3a3a;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   font-family: Arial, sans-serif;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
 }
 
 .box {
@@ -26,9 +35,9 @@ body {
   align-items: center;
   padding-top: 20px;
   position: relative;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
 }
 
-/* Anzeige */
 .display {
   width: 80%;
   background: #ddd;
@@ -37,25 +46,27 @@ body {
   text-align: center;
   font-size: 28px;
   padding: 8px;
+  color: #000;
+  font-weight: bold;
 }
 
-/* Großer Button */
 .main-btn {
-  margin-top: 75px; /* 🔥 etwas weiter runter */
+  margin-top: 75px;
   width: 155px;
   height: 155px;
   border-radius: 50%;
   border: none;
   color: white;
   font-size: 16px;
+  font-weight: bold;
   background: radial-gradient(circle at 30% 30%, #6fff6f, #1e8f1e);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.45);
 }
 
-/* Reset Button (JETZT PERFEKT POSITIONIERT) */
 .reset-btn {
   position: absolute;
-  top: 115px;   /* 🔥 runter */
-  right: 25px;  /* 🔥 etwas nach links */
+  top: 115px;
+  right: 25px;
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -63,6 +74,63 @@ body {
   background: #2ecc40;
   color: white;
   font-size: 18px;
+  font-weight: bold;
+}
+
+/* Custom Popup */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  justify-content: center;
+  align-items: center;
+  z-index: 99;
+}
+
+.modal {
+  width: 280px;
+  background: #151515;
+  border-radius: 22px;
+  padding: 22px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+
+.modal h2 {
+  margin: 0 0 12px;
+  font-size: 21px;
+}
+
+.modal p {
+  margin: 0 0 25px;
+  font-size: 16px;
+  color: #ddd;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 13px 0;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.no-btn {
+  background: #444;
+  color: white;
+}
+
+.yes-btn {
+  background: #2ecc40;
+  color: white;
 }
 </style>
 </head>
@@ -70,34 +138,68 @@ body {
 <body>
 
 <div class="box">
-
   <div id="counter" class="display">0000</div>
 
   <button class="main-btn" onclick="clickBtn()">DRÜCKEN</button>
 
-  <button class="reset-btn" onclick="resetCounter()">↻</button>
+  <button class="reset-btn" onclick="openReset()">↻</button>
+</div>
 
+<div id="modalBg" class="modal-bg">
+  <div class="modal">
+    <h2>Zurücksetzen?</h2>
+    <p>Möchten Sie wirklich neu starten?</p>
+
+    <div class="modal-buttons">
+      <button class="no-btn" onclick="closeReset()">Nein</button>
+      <button class="yes-btn" onclick="confirmReset()">Ja</button>
+    </div>
+  </div>
 </div>
 
 <script>
-let count = 0;
+let count = Number(localStorage.getItem("dhikrCounter")) || 0;
+update();
 
 function clickBtn() {
   count++;
+  save();
   update();
 }
 
 function update() {
   document.getElementById("counter").innerText =
-    count.toString().padStart(4, '0');
+    count.toString().padStart(4, "0");
 }
 
-function resetCounter() {
-  if (confirm("Möchten Sie wirklich neu starten?")) {
-    count = 0;
-    update();
-  }
+function save() {
+  localStorage.setItem("dhikrCounter", count);
 }
+
+function openReset() {
+  document.getElementById("modalBg").style.display = "flex";
+}
+
+function closeReset() {
+  document.getElementById("modalBg").style.display = "none";
+}
+
+function confirmReset() {
+  count = 0;
+  save();
+  update();
+  closeReset();
+}
+
+/* Double-Tap-Zoom verhindern */
+let lastTouch = 0;
+document.addEventListener("touchend", function(e) {
+  let now = Date.now();
+  if (now - lastTouch <= 300) {
+    e.preventDefault();
+  }
+  lastTouch = now;
+}, { passive: false });
 </script>
 
 </body>
